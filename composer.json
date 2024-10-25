@@ -1,0 +1,18 @@
+{
+    "name": "egord/php-test",
+    "autoload": {
+        "psr-4": {
+            "Egord\\PhpTest\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "physostegia",
+            "email": "email=nasvay2281337.aslan2009@gmail.com"
+        }
+    ],
+    "require": {},
+    "scripts": {
+        "run": "php index.php"
+    }
+}
