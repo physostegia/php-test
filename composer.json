@@ -11,7 +11,9 @@
             "email": "email=nasvay2281337.aslan2009@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "league/csv": "9.18.0"
+    },
     "scripts": {
         "run": "php index.php"
     }
