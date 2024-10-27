@@ -37,7 +37,7 @@ class CsvHandler
     {
         $result = [];
         if (($file = fopen($this->input_file, "r")) !== false) {
-            while (($data = fgetcsv($file, 1000, $this -> separator)) !== false) {
+            while (($data = fgetcsv($file, 1000, $this->separator)) !== false) {
 
 
 
@@ -82,10 +82,27 @@ class TournamentBracketHandler
     }
     private function ImitateBracket($bracket)
     {
-        for ($i = 0; $i < count($bracket); $i + 2) 
+        $rounds = count($bracket) - 1;
+        $stages = log(count($bracket), 2);
+        $currBracket = $bracket;
+        $repechageFight= [];
+        array_push($repechageFight, $bracket);
+       $winner = true;
+        for ($i = 1; $i < $stages; $i++) 
         {
-            $bracket[$i];
+            
+            for ($j = 0; $j < count($currBracket); $j+=2) 
+            {
+                if(!empty($bracket[$j]) && $winner)
+                {
+                    $bracket[$j][$i] = $bracket[$j][0];
+                    unset($currBracket[$j + 1]);
+
+                }   
+                $winner = !$winner;
+            }
         }
+        return $currBracket;
     }
     private function FormPreliminaryBracket($preliminaryFightsCount)
     {
@@ -93,9 +110,11 @@ class TournamentBracketHandler
         $membersCount = count($this->memberList);
         for ($i = 0; $i < $preliminaryFightsCount; $i++) 
         {
+            
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
-        return $memberList;
+         
+        return $this -> ImitateBracket($memberList);
     }
 
     function FormDefaultTournamentBracket()
@@ -105,18 +124,15 @@ class TournamentBracketHandler
         $preliminaryFightsCount = null;
 
 
-        for ($i = 2; $i <= $membersCount; $i *= 2) 
-        {
+        for ($i = 2; $i <= $membersCount; $i *= 2) {
 
             $mainMembersCount = $i;
         }
 
         $preliminaryFightsCount = $membersCount % $mainMembersCount;
 
-        if ($preliminaryFightsCount > 0) 
-        {
-            if ($preliminaryFightsCount & 1) 
-            {
+        if ($preliminaryFightsCount > 0) {
+            if ($preliminaryFightsCount & 1) {
                 $preliminaryFightsCount++;
             }
 
@@ -130,5 +146,5 @@ $m = $p->ReadCsv();
 
 
 $q = new TournamentBracketHandler($m);
+$q->ShuffleMembers();
 print_r($q->FormDefaultTournamentBracket());
- 
