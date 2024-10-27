@@ -1,0 +1,32 @@
+
+html{
+    font-family: 'GOST type A', sans-serif;
+   
+}
+.order {
+    
+    width: 1919px;
+    height: 585px;
+    background-image: url(img/фон.svg);
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+}
+.order-form {
+    width: 1354px;
+    height: 296px;
+    margin-top: 100px; 
+}
+.order-form input{
+    width: 484.61px;
+    height: 70px;
+
+}
+.order-form button{
+    width: 339px;
+    height: 70px;
+    background-color: #FF7200;
+}
+input.placeholder {
+    text-align: center;
+}
