@@ -94,7 +94,7 @@ class TournamentBracketHandler
 
                     $bracket[$j][$i] = $currBracket[$j][0];
                     
-                    $this -> consolationBracket[count($this -> memberList) - $j/2];
+                    
 
                      
                 }
@@ -112,6 +112,7 @@ class TournamentBracketHandler
     {
         $memberList = [];
         $membersCount = count($this->memberList);
+        
         for ($i = 0; $i < $preliminaryFightsCount; $i++) {
 
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
@@ -125,7 +126,7 @@ class TournamentBracketHandler
         $membersCount = count($this->memberList);
         $mainMembersCount = null;
         $preliminaryFightsCount = null;
-
+        $mainBracket = $this->memberList;
 
         for ($i = 2; $i <= $membersCount; $i *= 2) {
 
@@ -135,11 +136,20 @@ class TournamentBracketHandler
         $preliminaryFightsCount = $membersCount % $mainMembersCount;
 
         if ($preliminaryFightsCount > 0) {
-            if ($preliminaryFightsCount & 1) {
-                $preliminaryFightsCount++;
-            }
+           
 
             $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
+            foreach($preliminaryBracket as $member)
+            {
+                
+                if(empty($member[1]))
+                {
+                   unset($mainBracket[array_search($member, $mainBracket)]);
+                   echo $member[0];
+                }
+            
+            }
+            
         }
         return $preliminaryBracket;
     }
@@ -151,3 +161,4 @@ $m = $p->ReadCsv();
 $q = new TournamentBracketHandler($m);
 $q->ShuffleMembers();
 print_r($q->FormDefaultTournamentBracket());
+?>
