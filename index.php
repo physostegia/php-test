@@ -6,7 +6,7 @@ class CsvHandler
 {
     private $input_file;
     private $separator;
-
+    
 
     function __construct($input_file)
     {
@@ -67,7 +67,7 @@ class CsvHandler
 class TournamentBracketHandler
 {
     private $memberList = [];
-
+    private $consolationBracket = [];
 
     function __construct($memberList)
     {
@@ -80,41 +80,44 @@ class TournamentBracketHandler
     {
         shuffle($this->memberList);
     }
-    private function ImitateBracket($bracket)
+    private function ImitateBracket($bracket, $stages = null, $numberOfRounds = null)
     {
-        $rounds = count($bracket) - 1;
-        $stages = log(count($bracket), 2);
+        $numberOfRounds = $numberOfRounds ?? count($bracket) - 1;
+        $stages = $stages ?? log(count($bracket), 2);
         $currBracket = $bracket;
-        $repechageFight= [];
-        array_push($repechageFight, $bracket);
-       $winner = true;
-        for ($i = 1; $i < $stages; $i++) 
-        {
-            
-            for ($j = 0; $j < count($currBracket); $j+=2) 
-            {
-                if(!empty($bracket[$j]) && $winner)
-                {
-                    $bracket[$j][$i] = $bracket[$j][0];
-                    unset($currBracket[$j + 1]);
 
-                }   
-                $winner = !$winner;
+        for ($i = 1; $i <= $stages; $i++) {
+
+            for ($j = 0; $j < count($currBracket); $j += 2) {
+
+                if (isset($currBracket[$j]) && isset($currBracket[$j + 1])) {
+
+                    $bracket[$j][$i] = $currBracket[$j][0];
+                    
+                    $this -> consolationBracket[count($this -> memberList) - $j/2];
+
+                     
+                }
             }
+
+
+            $currBracket = array_filter($bracket, function ($item) use ($i) {
+                return isset($item[$i]);
+            });
         }
-        return $currBracket;
+
+        return $bracket;
     }
     private function FormPreliminaryBracket($preliminaryFightsCount)
     {
         $memberList = [];
         $membersCount = count($this->memberList);
-        for ($i = 0; $i < $preliminaryFightsCount; $i++) 
-        {
-            
+        for ($i = 0; $i < $preliminaryFightsCount; $i++) {
+
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
-         
-        return $this -> ImitateBracket($memberList);
+
+        return $this->ImitateBracket($memberList, 1, count($memberList) / 2);
     }
 
     function FormDefaultTournamentBracket()
