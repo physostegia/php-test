@@ -6,7 +6,7 @@ class CsvHandler
 {
     private $input_file;
     private $separator;
-    
+
 
     function __construct($input_file)
     {
@@ -85,25 +85,29 @@ class TournamentBracketHandler
         $numberOfRounds = $numberOfRounds ?? count($bracket) - 1;
         $stages = $stages ?? log(count($bracket), 2);
         $currBracket = $bracket;
+        $matchesPerStage = [];
 
-        for ($i = 1; $i <= $stages; $i++) {
+        for ($k = 1; $k <= $stages; $k++) {
+            $matchesPerStage[$k] = count($bracket) / (2 ** $k);
+        }
 
-            for ($j = 0; $j < count($currBracket); $j += 2) {
+        
 
-                if (isset($currBracket[$j]) && isset($currBracket[$j + 1])) {
 
-                    $bracket[$j][$i] = $currBracket[$j][0];
-                    
-                    
+        $winnerFactor = 2;
+        for ($i = 0; $i < $stages; $i++) {
 
-                     
+            
+            for ($j = 0; $j < $matchesPerStage[$i + 1]; $j++) {
+                echo $winnerFactor;
+                if (!empty($bracket[$j*$winnerFactor][$i])) {
+
+                    $bracket[$j*$winnerFactor][$i + 1] = $bracket[$j*$winnerFactor][0];
                 }
             }
+            $winnerFactor*=2;
 
-
-            $currBracket = array_filter($bracket, function ($item) use ($i) {
-                return isset($item[$i]);
-            });
+            
         }
 
         return $bracket;
@@ -112,7 +116,7 @@ class TournamentBracketHandler
     {
         $memberList = [];
         $membersCount = count($this->memberList);
-        
+
         for ($i = 0; $i < $preliminaryFightsCount; $i++) {
 
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
@@ -136,22 +140,19 @@ class TournamentBracketHandler
         $preliminaryFightsCount = $membersCount % $mainMembersCount;
 
         if ($preliminaryFightsCount > 0) {
-           
+
 
             $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
-            foreach($preliminaryBracket as $member)
-            {
-                
-                if(empty($member[1]))
-                {
-                   unset($mainBracket[array_search($member, $mainBracket)]);
-                   echo $member[0];
+            foreach ($preliminaryBracket as $member) {
+
+                if (empty($member[1])) {
+                    unset($mainBracket[array_search($member, $mainBracket)]);
                 }
-            
             }
-            
+            $mainBracket = array_values($mainBracket);
         }
-        return $preliminaryBracket;
+        $mainBracket = $this->ImitateBracket($mainBracket);
+        return $mainBracket;
     }
 }
 $p = new CsvHandler("сетка.csv");
@@ -160,5 +161,4 @@ $m = $p->ReadCsv();
 
 $q = new TournamentBracketHandler($m);
 $q->ShuffleMembers();
-print_r($q->FormDefaultTournamentBracket());
-?>
+$p -> WriteCsv("dasda.csv", $q->FormDefaultTournamentBracket());
