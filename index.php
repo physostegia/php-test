@@ -86,32 +86,42 @@ class TournamentBracketHandler
         $stages = $stages ?? log(count($bracket), 2);
         $currBracket = $bracket;
         $matchesPerStage = [];
-
+    
+       
         for ($k = 1; $k <= $stages; $k++) {
-            $matchesPerStage[$k] = count($bracket) / (2 ** $k);
+            $matchesPerStage[$k] = intdiv(count($bracket), 2 ** $k);
         }
-
-        
-
-
+    
         $winnerFactor = 2;
+        $looserFactor = 1;
+    
         for ($i = 0; $i < $stages; $i++) {
-
-            
+           
+            if (!isset($matchesPerStage[$i + 1])) {
+                continue;
+            }
+    
             for ($j = 0; $j < $matchesPerStage[$i + 1]; $j++) {
-                echo $winnerFactor;
-                if (!empty($bracket[$j*$winnerFactor][$i])) {
-
-                    $bracket[$j*$winnerFactor][$i + 1] = $bracket[$j*$winnerFactor][0];
+                $winnerIndex = $j * $winnerFactor;
+                $loserIndex = $winnerIndex + $looserFactor;
+    
+                if (isset($bracket[$winnerIndex])) {
+                    $bracket[$winnerIndex][$i + 1] = $bracket[$winnerIndex][0];
+                }
+    
+                if (isset($bracket[$loserIndex])) {
+                    $this->consolationBracket[$loserIndex] = $bracket[$loserIndex];
                 }
             }
-            $winnerFactor*=2;
-
-            
+    
+            $winnerFactor *= 2;
+            $looserFactor *= 2;
         }
-
+    
+        print_r($this->consolationBracket);
         return $bracket;
     }
+    
     private function FormPreliminaryBracket($preliminaryFightsCount)
     {
         $memberList = [];
@@ -152,7 +162,8 @@ class TournamentBracketHandler
             $mainBracket = array_values($mainBracket);
         }
         $mainBracket = $this->ImitateBracket($mainBracket);
-        return $mainBracket;
+        $consolationBracket = $this -> ImitateBracket($this->consolationBracket);
+        return array_merge($preliminaryBracket, [[" "]], [["основная"]], $mainBracket,[["qweqwe"]], [[" "]], $consolationBracket);
     }
 }
 $p = new CsvHandler("сетка.csv");
@@ -161,4 +172,4 @@ $m = $p->ReadCsv();
 
 $q = new TournamentBracketHandler($m);
 $q->ShuffleMembers();
-$p -> WriteCsv("dasda.csv", $q->FormDefaultTournamentBracket());
+$p->WriteCsv("dasda.csv", $q->FormDefaultTournamentBracket());
