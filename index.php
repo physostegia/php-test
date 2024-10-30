@@ -1,24 +1,18 @@
 <?php
 
-use League\Csv\Reader;
-
 class CsvHandler
 {
-    private $input_file;
-    private $separator;
+    private $separator = ';';
+    
 
 
-    function __construct($input_file)
-    {
-        $this->input_file = $input_file;
-        $this->separator = $this->DetectDelimiter();
-    }
+   
 
-    function DetectDelimiter()
+    function DetectDelimiter($input_file)
     {
         $delimiters = [";" => 0, "," => 0, "\t" => 0, "|" => 0];
 
-        if (($handle = fopen($this->input_file, "r")) !== false) {
+        if (($handle = fopen($input_file, "r")) !== false) {
 
             $firstLine = fgets($handle);
             fclose($handle);
@@ -26,18 +20,21 @@ class CsvHandler
             foreach ($delimiters as $delimiter => &$count) {
                 $count = count(str_getcsv($firstLine, $delimiter));
             }
-
-            return array_search(max($delimiters), $delimiters);
+            
+            $this -> separator = array_search(max($delimiters), $delimiters);
         } else {
-            throw new Exception("Не удалось открыть файл: " . $this->input_file);
+            throw new Exception("Не удалось открыть файл: " . $input_file);
         }
     }
 
-    function ReadCsv()
+    function ReadCsv($input_file, $separator = null)
     {
+        $this -> DetectDelimiter($input_file);
+        $separator = $separator ?? $this -> separator;
+       
         $result = [];
-        if (($file = fopen($this->input_file, "r")) !== false) {
-            while (($data = fgetcsv($file, 1000, $this->separator)) !== false) {
+        if (($file = fopen($input_file, "r")) !== false) {
+            while (($data = fgetcsv($file, 2000, $separator)) !== false) {
 
 
 
@@ -48,14 +45,14 @@ class CsvHandler
             }
             fclose($file);
         } else {
-            throw new Exception("Не удалось открыть файл: " . $this->input_file);
+            throw new Exception("Не удалось открыть файл: " . $input_file);
         }
         return $result;
     }
 
     function WriteCsv($output_file, $data, $separator = null)
     {
-        $separator = $separator ?? $this->separator;
+        $separator = $separator ?? $this -> separator;
         $file = fopen($output_file, 'w');
         foreach ($data as $line) {
             fputcsv($file, $line, $separator);
@@ -67,7 +64,7 @@ class CsvHandler
 class TournamentBracketHandler
 {
     private $memberList = [];
-    private $consolationBracket = [];
+    public $consolationBracket = [];
 
     function __construct($memberList)
     {
@@ -80,48 +77,35 @@ class TournamentBracketHandler
     {
         shuffle($this->memberList);
     }
-    private function ImitateBracket($bracket, $stages = null, $numberOfRounds = null)
+    public function ImitateBracket($bracket, $stages = null)
     {
-        $numberOfRounds = $numberOfRounds ?? count($bracket) - 1;
+        
         $stages = $stages ?? log(count($bracket), 2);
-        $currBracket = $bracket;
-        $matchesPerStage = [];
-    
-       
-        for ($k = 1; $k <= $stages; $k++) {
-            $matchesPerStage[$k] = intdiv(count($bracket), 2 ** $k);
-        }
-    
-        $winnerFactor = 2;
-        $looserFactor = 1;
-    
+
+
+
         for ($i = 0; $i < $stages; $i++) {
+            $currStage = array_filter(array_map(function ($item, $key) use ($i) {
+                if (!empty($item[$i])) {
+                    return [$item[0], $key];
+                }
+            }, $bracket, array_keys($bracket)));
+            
+            $currStage = array_values($currStage);
            
-            if (!isset($matchesPerStage[$i + 1])) {
-                continue;
+            for ($j = 0; $j < count($currStage); $j += 2) {
+                
+                $bracket[$currStage[$j][1]][$i + 1] = $bracket[$currStage[$j][1]][0];
+                $this -> consolationBracket[count($bracket) - $currStage[$j + 1][1]] = $bracket[$currStage[$j + 1][1]];
             }
-    
-            for ($j = 0; $j < $matchesPerStage[$i + 1]; $j++) {
-                $winnerIndex = $j * $winnerFactor;
-                $loserIndex = $winnerIndex + $looserFactor;
-    
-                if (isset($bracket[$winnerIndex])) {
-                    $bracket[$winnerIndex][$i + 1] = $bracket[$winnerIndex][0];
-                }
-    
-                if (isset($bracket[$loserIndex])) {
-                    $this->consolationBracket[$loserIndex] = $bracket[$loserIndex];
-                }
-            }
-    
-            $winnerFactor *= 2;
-            $looserFactor *= 2;
+            
         }
-    
-        print_r($this->consolationBracket);
+        print_r($this -> consolationBracket);
+
+
         return $bracket;
     }
-    
+
     private function FormPreliminaryBracket($preliminaryFightsCount)
     {
         $memberList = [];
@@ -132,7 +116,7 @@ class TournamentBracketHandler
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
 
-        return $this->ImitateBracket($memberList, 1, count($memberList) / 2);
+        return $this->ImitateBracket($memberList, 1);
     }
 
     function FormDefaultTournamentBracket()
@@ -162,14 +146,15 @@ class TournamentBracketHandler
             $mainBracket = array_values($mainBracket);
         }
         $mainBracket = $this->ImitateBracket($mainBracket);
-        $consolationBracket = $this -> ImitateBracket($this->consolationBracket);
-        return array_merge($preliminaryBracket, [[" "]], [["основная"]], $mainBracket,[["qweqwe"]], [[" "]], $consolationBracket);
+        $consolationBracket = $this->ImitateBracket($this->consolationBracket);
+        return array_merge($preliminaryBracket, [[" "]], [["основная"]],[[" "]], $mainBracket,[[" "]],  [["утешительная"]], [[" "]], $consolationBracket);
     }
 }
-$p = new CsvHandler("сетка.csv");
-$m = $p->ReadCsv();
-
-
+$p = new CsvHandler();
+$m = $p->ReadCsv("сетка.csv");
 $q = new TournamentBracketHandler($m);
+
 $q->ShuffleMembers();
-$p->WriteCsv("dasda.csv", $q->FormDefaultTournamentBracket());
+
+
+$p->WriteCsv("qq.csv", $q->FormDefaultTournamentBracket());
