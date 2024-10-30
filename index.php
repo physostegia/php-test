@@ -71,6 +71,8 @@ class TournamentBracketHandler
         unset($memberList[0]);
         $memberList = array_values($memberList);
         $this->memberList = $memberList;
+        
+        
     }
 
     function ShuffleMembers()
@@ -81,7 +83,7 @@ class TournamentBracketHandler
     {
         
         $stages = $stages ?? log(count($bracket), 2);
-
+       
 
 
         for ($i = 0; $i < $stages; $i++) {
@@ -95,12 +97,20 @@ class TournamentBracketHandler
            
             for ($j = 0; $j < count($currStage); $j += 2) {
                 
-                $bracket[$currStage[$j][1]][$i + 1] = $bracket[$currStage[$j][1]][0];
-                $this -> consolationBracket[count($bracket) - $currStage[$j + 1][1]] = $bracket[$currStage[$j + 1][1]];
+                $bracket[$currStage[$j][1]][$i + 1] = $this -> memberList[$currStage[$j][1]][0];
+                if(!empty($bracket[$currStage[$j + 1][1]][1]) || $j <=  count($currStage))
+                {
+                    array_push($this -> consolationBracket, $this -> memberList[$currStage[$j + 1][1]]);
+                    
+                }
+                else
+                {
+                    array_unshift($this -> consolationBracket, $this -> memberList[$currStage[$j + 1][1]]);
+                }
             }
             
         }
-        print_r($this -> consolationBracket);
+        
 
 
         return $bracket;
