@@ -1,12 +1,17 @@
 <?php
+$csvHandler = new CsvHandler();
+$bracketInput = $csvHandler->ReadCsv("сетка.csv");
+$tornament = new TournamentBracketHandler($bracketInput);
+
+$tornament->ShuffleMembers();
+$outputBracket = $tornament->FormDefaultTournamentBracket();
+
+$csvHandler->WriteCsv("qq.csv", $outputBracket);
 
 class CsvHandler
 {
     private $separator = ';';
-    
 
-
-   
 
     function DetectDelimiter($input_file)
     {
@@ -20,8 +25,8 @@ class CsvHandler
             foreach ($delimiters as $delimiter => &$count) {
                 $count = count(str_getcsv($firstLine, $delimiter));
             }
-            
-            $this -> separator = array_search(max($delimiters), $delimiters);
+            $delimiter = array_search(max($delimiters), $delimiters);
+            $this->separator = $delimiter;
         } else {
             throw new Exception("Не удалось открыть файл: " . $input_file);
         }
@@ -29,15 +34,13 @@ class CsvHandler
 
     function ReadCsv($input_file, $separator = null)
     {
-        $this -> DetectDelimiter($input_file);
-        $separator = $separator ?? $this -> separator;
-       
+        $this->DetectDelimiter($input_file);
+        $separator = $separator ?? $this->separator;
         $result = [];
+
         if (($file = fopen($input_file, "r")) !== false) {
+
             while (($data = fgetcsv($file, 2000, $separator)) !== false) {
-
-
-
 
                 if (!empty($data[0])) {
                     $result[] = $data;
@@ -52,7 +55,7 @@ class CsvHandler
 
     function WriteCsv($output_file, $data, $separator = null)
     {
-        $separator = $separator ?? $this -> separator;
+        $separator = $separator ?? $this->separator;
         $file = fopen($output_file, 'w');
         foreach ($data as $line) {
             fputcsv($file, $line, $separator);
@@ -71,20 +74,15 @@ class TournamentBracketHandler
         unset($memberList[0]);
         $memberList = array_values($memberList);
         $this->memberList = $memberList;
-        
-        
     }
 
     function ShuffleMembers()
     {
         shuffle($this->memberList);
     }
-    public function ImitateBracket($bracket, $stages = null)
+    private function ImitateBracket($bracket, $stages = null)
     {
-        
         $stages = $stages ?? log(count($bracket), 2);
-       
-
 
         for ($i = 0; $i < $stages; $i++) {
             $currStage = array_filter(array_map(function ($item, $key) use ($i) {
@@ -92,28 +90,23 @@ class TournamentBracketHandler
                     return [$item[0], $key];
                 }
             }, $bracket, array_keys($bracket)));
-            
+
             $currStage = array_values($currStage);
-           
+
             for ($j = 0; $j < count($currStage); $j += 2) {
-                
+
                 $bracket[$currStage[$j][1]][$i + 1] = $bracket[$currStage[$j][1]][0];
                 if (isset($currStage[$j + 1][1])) {
-                    
-                if(!empty($bracket[$currStage[$j + 1][1]][1]) || $j <=  count($currStage))
-                {
-                    array_push($this -> consolationBracket, $this -> memberList[$currStage[$j + 1][1]]);
-                    
-                }
-                else
-                {
-                    array_unshift($this -> consolationBracket, $this -> memberList[$currStage[$j + 1][1]]);
+
+                    if (!empty($bracket[$currStage[$j + 1][1]][1]) || $j <=  count($currStage)) {
+                        array_push($this->consolationBracket, $this->memberList[$currStage[$j + 1][1]]);
+                    } else {
+                        array_unshift($this->consolationBracket, $this->memberList[$currStage[$j + 1][1]]);
+                    }
                 }
             }
-            }
-            
         }
-        
+
 
 
         return $bracket;
@@ -134,10 +127,12 @@ class TournamentBracketHandler
 
     function FormDefaultTournamentBracket()
     {
+        
         $membersCount = count($this->memberList);
         $mainMembersCount = null;
         $preliminaryFightsCount = null;
         $mainBracket = $this->memberList;
+        $preliminaryBracket = [];
 
         for ($i = 2; $i <= $membersCount; $i *= 2) {
 
@@ -148,8 +143,7 @@ class TournamentBracketHandler
 
         if ($preliminaryFightsCount > 0) {
 
-
-            $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
+             $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
             foreach ($preliminaryBracket as $member) {
 
                 if (empty($member[1])) {
@@ -160,14 +154,9 @@ class TournamentBracketHandler
         }
         $mainBracket = $this->ImitateBracket($mainBracket);
         $consolationBracket = $this->ImitateBracket($this->consolationBracket);
-        return array_merge($preliminaryBracket, [[" "]], [["основная"]],[[" "]], $mainBracket,[[" "]],  [["утешительная"]], [[" "]], $consolationBracket);
+        
+        
+        
+        return array_merge($preliminaryBracket,[[' ']],[['Предварительная сетка']],[[' ']],$mainBracket,[[' ']],[['Основная сетка']],[[' ']],$consolationBracket,[[' ']],[['Утешительная сетка']]);
     }
 }
-$p = new CsvHandler();
-$m = $p->ReadCsv("сетка.csv");
-$q = new TournamentBracketHandler($m);
-
-$q->ShuffleMembers();
-
-
-$p->WriteCsv("qq.csv", $q->FormDefaultTournamentBracket());
