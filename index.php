@@ -97,7 +97,7 @@ class TournamentBracketHandler
            
             for ($j = 0; $j < count($currStage); $j += 2) {
                 
-                $bracket[$currStage[$j][1]][$i + 1] = $this -> memberList[$currStage[$j][1]][0];
+                $bracket[$currStage[$j][1]][$i + 1] = $bracket[$currStage[$j][1]][0];
                 if(!empty($bracket[$currStage[$j + 1][1]][1]) || $j <=  count($currStage))
                 {
                     array_push($this -> consolationBracket, $this -> memberList[$currStage[$j + 1][1]]);
