@@ -22,7 +22,7 @@
    bracketInput = $csvHandler->ReadCsv("путь-к-сетке.csv");
 5. Установите значение пути к выходному списку
    ```bash
-   $csvHandler->WriteCsv("qq.csv", $outputBracket);
+   $csvHandler->WriteCsv("путь-к-выходной-сетке.csv", $outputBracket);
 6. Запустите проект:
    ```bash
    composer run
