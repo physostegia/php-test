@@ -17,6 +17,13 @@
 3. Установите зависимости с помощью Composer(их нет):
    ```bash
    composer install
-3. Запустите проект:
+4. Установите значение пути к исходному списку
+   ```bash
+   bracketInput = $csvHandler->ReadCsv("путь-к-сетке.csv");
+5. Установите значение пути к выходному списку
+   ```bash
+   $csvHandler->WriteCsv("qq.csv", $outputBracket);
+6. Запустите проект:
    ```bash
    composer run
+
