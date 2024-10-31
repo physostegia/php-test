@@ -13,7 +13,7 @@ class CsvHandler
     private $separator = ';';
 
 
-    function DetectDelimiter($input_file)
+    private function DetectDelimiter($input_file)
     {
         $delimiters = [";" => 0, "," => 0, "\t" => 0, "|" => 0];
 
@@ -67,7 +67,7 @@ class CsvHandler
 class TournamentBracketHandler
 {
     private $memberList = [];
-    public $consolationBracket = [];
+    private $consolationBracket = [];
 
     function __construct($memberList)
     {
