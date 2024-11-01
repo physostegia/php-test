@@ -159,10 +159,14 @@ class TournamentBracketHandler
         $consolationBracket = $this->ImitateBracket($this->consolationBracket, null, true);
 
         return array_merge(
-            $preliminaryBracket,
+            
             $mainBracket,
             [[' ']],
             [['Основная сетка']],
+            [[' ']],
+            $preliminaryBracket,
+            [[' ']],
+            [['Предварительная сетка']],
             [[' ']],
             $consolationBracket,
             [[' ']],
