@@ -101,7 +101,7 @@ class TournamentBracketHandler
                     if (!empty($bracket[$currStage[$j + 1][1]][1]) || $j <=  count($currStage)) {
                         array_push($this->consolationBracket, $this->memberList[$currStage[$j + 1][1]]);
                     } else {
-                        array_unshift($this->consolationBracket, $this->memberList[$currStage[$j + 1][1]]);
+                        array_unshift($this->consolationBracket, $this->$bracket[$currStage[$j + 1][1]]);
                     }
                 }
             }
