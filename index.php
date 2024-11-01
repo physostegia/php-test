@@ -84,6 +84,10 @@ class TournamentBracketHandler
     private function ImitateBracket($bracket, $stages = null, $isConsolation = false)
     {
         $stages = $stages ?? log(count($bracket), 2);
+        if($isConsolation)
+        {
+            $stages+=1;
+        }
         for ($i = 0; $i < $stages; $i++) {
             $currStage = array_filter(array_map(function ($item, $key) use ($i) {
                 if (!empty($item[$i])) {
