@@ -118,7 +118,7 @@ class TournamentBracketHandler
     {
         $memberList = [];
         $membersCount = count($this->memberList);
-
+    
         for ($i = 0; $i < $preliminaryFightsCount; $i++) {
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
@@ -129,6 +129,11 @@ class TournamentBracketHandler
     function FormDefaultTournamentBracket()
     {
         $membersCount = count($this->memberList);
+          if($membersCount < 2)
+        {
+           
+            throw new Exception("Недостаточно участников для формирования сетки");
+        }
         $mainMembersCount = null;
         $preliminaryFightsCount = null;
         $mainBracket = $this->memberList;
@@ -155,9 +160,6 @@ class TournamentBracketHandler
 
         return array_merge(
             $preliminaryBracket,
-            [[' ']],
-            [['Предварительная сетка']],
-            [[' ']],
             $mainBracket,
             [[' ']],
             [['Основная сетка']],
