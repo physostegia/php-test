@@ -1,31 +1,44 @@
-@import url('https://fonts.cdnfonts.com/css/gost-type-a');
-html{
+
+body {
+    font-family: 'inter', sans-serif;
+}
+
+
+.font-form
+{
     font-family: 'GOST type A', sans-serif;
-   
+    
 }
 .order {
-    
+    margin-left: -1px;
     width: 100%;
     height: 585px;
     background-image: url(img/фон.svg);
+    background-size: cover;
+   
     display: flex;
     justify-content: center; 
     align-items: center;     
 }
-.order-form {
-    width: 1354px;
+.order h1 {
+    font-size: 46px;
+   margin-bottom: 34px;
+}
+.order-content {
+        
+    margin-top: 55px;
+    
     height: 296px;
     
 }
-.order-form input{
+.order-content input{
     width: 484.61px;
     height: 70px;
 	border: 0;
-    margin-right: 16px;
     text-align: center; 
 }
 
-.order-form button{
+.order-content button{
     width: 339px;
     height: 70px;
     background-color: #FF7200;
@@ -43,15 +56,18 @@ height: 86px;
 line-height: 24px;
 font-size: 24px;
 }
-a{
+a {
     text-decoration: none;
     color: #FF7200;
 }
-a:link {
+a:link,
+a:hover,
+a:active,
+a:visited {
     color: #FF7200;
-    
     text-decoration: none;
-  }
+}
+
 .contacts-text{
     width: 275px;
     height: 58px;
@@ -59,20 +75,21 @@ a:link {
 
 @media screen and (max-width: 1400px) {
     .order {
-        height: 585px;
-           
+        
+        height: 615px;
+        background-position: 28%;
     }
-    .order-form {
-        width: 1160px;
+    .order-content {
+       
         height: 296px;
         
     }
-    .order-form input{
+    .order-content input{
         width: 413.15px;
         height: 70px;
       
     }
-    .order-form button{
+    .order-content button{
         width: 287px;
         height: 70px;
         
@@ -81,22 +98,69 @@ a:link {
 @media screen and (max-width: 768px) {
     .order {
         width: 768px;
-        height: 585px;
-           
+        height: 615px;
+        background-position: 28%;
     }
-    .order-form {
-        width: 750px;
-        height: 70px;
+    .order-content {
+       
+        height: 296px;
         
     }
-    .order-form input{
+    .order-content input{
         width: 251.26px;
         height: 70px;
       
     }
-    .order-form button{
+    .order-content button{
         width: 196px;
         height: 70px;
         
+        
     }
-  }
+    .data-sec-text
+    {
+        font-size: 12px;
+
+    }
+}
+@media screen and (max-width: 374px) {
+    .order {
+        background-position: 28%;
+        width: 374px;
+        height: 710px;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .order-content {
+       width: 328px;
+        height: 504px;
+        margin-top: 0;
+        margin-bottom: 100px;
+    }
+    .order-content input{
+        width: 327.70px;
+        height: 70px;
+        margin-bottom: 22px;
+        
+      
+    }
+    .order-content button{
+        width: 327.70px;
+        height: 70px;
+        
+        
+    }
+    .data-sec-text
+    {
+        font-size: 12px;
+        width: 310px;   
+        margin-inline: auto;
+        margin-top: 15px;
+    }
+    .contacts{
+        width: 313px;
+        height: 86px;
+        
+        }
+}
