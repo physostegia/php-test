@@ -13,7 +13,7 @@ body {
     margin-left: -1px;
     width: 100%;
     height: 585px;
-    background-image: url(img/фон.svg);
+    background-image: url(../img/фон.svg);
     background-size: cover;
    
     display: flex;
