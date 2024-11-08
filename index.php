@@ -1,7 +1,7 @@
 <?php
 $csvHandler = new CsvHandler();
 $bracketInput = $csvHandler->ReadCsv("сетка.csv");
-$tornament = new TournamentBracketHandler($bracketInput);
+$tornament = new TournamentBracketHandler($bracketInput, 10);
 
 $tornament->ShuffleMembers();
 $outputBracket = $tornament->FormDefaultTournamentBracket();
@@ -68,12 +68,21 @@ class TournamentBracketHandler
 {
     private $memberList = [];
     private $consolationBracket = [];
-
-    function __construct($memberList)
+    private $consolationTime;
+    private $tornamentTime = null;
+   
+    
+    public $fightBreakTime;
+    public $fightTime; 
+    public $bracketBreakTime;
+    
+    function __construct($memberList, $fightTime,$fightBreakTime = null, $bracketBreakTime = null)
     {
         unset($memberList[0]);
         $memberList = array_values($memberList);
         $this->memberList = $memberList;
+        $this->fightTime = $fightTime;
+        $this->fightBreakTime= $fightBreakTime;
     }
 
     function ShuffleMembers()
@@ -81,8 +90,9 @@ class TournamentBracketHandler
         shuffle($this->memberList);
     }
 
-    private function ImitateBracket($bracket, $stages = null, $isConsolation = false)
+    private function ImitateBracket($bracket, $bracketName, $stages = null, $isConsolation = false)
     {
+        $time = 0;
         $stages = $stages ?? log(count($bracket), 2);
         if($isConsolation)
         {
@@ -99,7 +109,7 @@ class TournamentBracketHandler
 
             for ($j = 0; $j < count($currStage); $j += 2) {
                 $bracket[$currStage[$j][1]][$i + 1] = $bracket[$currStage[$j][1]][0];
-
+                $time += $this -> fightTime;
                 if (isset($currStage[$j + 1][1]) && !$isConsolation) {
                     
                     if (!empty($bracket[$currStage[$j + 1][1]][1]) || $j <= count($currStage)) {
@@ -110,7 +120,9 @@ class TournamentBracketHandler
                 }
             }
         }
-
+        
+        array_unshift($bracket, [$bracketName, $time]);
+print_r($bracket);
         return $bracket;
     }
 
@@ -123,7 +135,7 @@ class TournamentBracketHandler
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
 
-        return $this->ImitateBracket($memberList, 1);
+        return $this->ImitateBracket($memberList,"предварительная", 1);
     }
 
     function FormDefaultTournamentBracket()
@@ -155,22 +167,16 @@ class TournamentBracketHandler
             $mainBracket = array_values($mainBracket);
         }
 
-        $mainBracket = $this->ImitateBracket($mainBracket);
-        $consolationBracket = $this->ImitateBracket($this->consolationBracket, null, true);
-
+        $mainBracket = $this->ImitateBracket($mainBracket, "основная");
+        $consolationBracket = $this->ImitateBracket($this->consolationBracket,"утешительная", null, true);
+        echo $this -> consolationTime;
         return array_merge(
-            
-            $mainBracket,
-            [[' ']],
-            [['Основная сетка']],
-            [[' ']],
             $preliminaryBracket,
             [[' ']],
-            [['Предварительная сетка']],
+            $mainBracket,
             [[' ']],
             $consolationBracket,
-            [[' ']],
-            [['Утешительная сетка']]
+            
         );
     }
 }
