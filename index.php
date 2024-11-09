@@ -123,14 +123,14 @@ class TournamentBracketHandler
                 return "";
             }, $bracket[0]);
         }
-       $bracketHeader = $this->bracketHeader;
-       $bracketHeader[0] = $bracketName;
-        
+        $bracketHeader = $this->bracketHeader;
+        $bracketHeader[0] = $bracketName;
+
         $bracketAmount = $fightCount * $this->fightTime + ($fightCount - 1) * ($this->fightBreakTime ?? 0);
-        echo $bracketName. " - " . $bracketAmount . " минут. \n";
+        echo $bracketName . " - " . $bracketAmount . " минут. \n";
         $this->tornamentTime += $bracketAmount + ($this->bracketBreakTime ?? 0);
-        array_unshift($bracket,$this -> bracketHeader,  $bracketHeader);
-        
+        array_unshift($bracket, $this->bracketHeader,  $bracketHeader);
+
         return $bracket;
     }
 
@@ -176,19 +176,19 @@ class TournamentBracketHandler
 
         $mainBracket = $this->ImitateBracket($mainBracket, "основная сетка");
         $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная сетка", null, true);
-       echo "время прохождения турнира - " . $this -> tornamentTime . " минут.";
+        echo "время прохождения турнира - " . $this->tornamentTime . " минут.";
 
         $result = array_merge(
-                
+
             $preliminaryBracket,
-           
+
             $mainBracket,
-            
+
             $consolationBracket,
 
         );
         array_shift($result);
-        
+
         return $result;
     }
 }
