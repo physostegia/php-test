@@ -123,11 +123,13 @@ class TournamentBracketHandler
                 return "";
             }, $bracket[0]);
         }
-        $this->bracketHeader[0] = $bracketName;
+       $bracketHeader = $this->bracketHeader;
+       $bracketHeader[0] = $bracketName;
+        
         $bracketAmount = $fightCount * $this->fightTime + ($fightCount - 1) * ($this->fightBreakTime ?? 0);
-        $this->bracketHeader[1] = $bracketAmount;
+        echo $bracketName. " - " . $bracketAmount . " минут. \n";
         $this->tornamentTime += $bracketAmount + ($this->bracketBreakTime ?? 0);
-        array_unshift($bracket, $this->bracketHeader);
+        array_unshift($bracket,$this -> bracketHeader,  $bracketHeader);
         
         return $bracket;
     }
@@ -141,7 +143,7 @@ class TournamentBracketHandler
             array_push($memberList, $this->memberList[$i], $this->memberList[$membersCount - ($i + 1)]);
         }
 
-        return $this->ImitateBracket($memberList, "предварительная", 1);
+        return $this->ImitateBracket($memberList, "предварительная сетка", 1);
     }
 
     function FormDefaultTournamentBracket()
@@ -172,13 +174,11 @@ class TournamentBracketHandler
             $mainBracket = array_values($mainBracket);
         }
 
-        $mainBracket = $this->ImitateBracket($mainBracket, "основная");
-        $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная", null, true);
-        $this -> bracketHeader[0] = "время проведения турнира";
-        $this -> bracketHeader[1] = $this -> tornamentTime;
-        array_unshift($preliminaryBracket, $this -> bracketHeader);
-        print_r($this -> bracketHeader);
-        return array_merge(
+        $mainBracket = $this->ImitateBracket($mainBracket, "основная сетка");
+        $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная сетка", null, true);
+       echo "время прохождения турнира - " . $this -> tornamentTime . " минут.";
+
+        $result = array_merge(
                 
             $preliminaryBracket,
            
@@ -187,5 +187,8 @@ class TournamentBracketHandler
             $consolationBracket,
 
         );
+        array_shift($result);
+        
+        return $result;
     }
 }
