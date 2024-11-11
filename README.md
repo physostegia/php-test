@@ -19,7 +19,7 @@
    composer install
 4. Установите значение пути к исходному списку
    ```bash
-   bracketInput = $csvHandler->ReadCsv("путь-к-сетке.csv");
+   $bracketInput = $csvHandler->ReadCsv("путь-к-сетке.csv");
 5. Установите значение пути к выходному списку
    ```bash
    $csvHandler->WriteCsv("путь-к-выходной-сетке.csv", $outputBracket);
