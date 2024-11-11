@@ -1,7 +1,7 @@
 <?php
 $csvHandler = new CsvHandler();
 $bracketInput = $csvHandler->ReadCsv("сетка.csv");
-$tornament = new TournamentBracketHandler($bracketInput, 10, 10);
+$tornament = new TournamentBracketHandler($bracketInput, 10, 10, 10);
 
 $tornament->ShuffleMembers();
 $outputBracket = $tornament->FormDefaultTournamentBracket();
@@ -70,6 +70,7 @@ class TournamentBracketHandler
     private $consolationBracket = [];
     private $tornamentTime = null;
     private $bracketHeader = null;
+    private $bracketCount = 0;
 
     public $fightBreakTime;
     public $fightTime;
@@ -82,6 +83,7 @@ class TournamentBracketHandler
         $this->memberList = $memberList;
         $this->fightTime = $fightTime;
         $this->fightBreakTime = $fightBreakTime;
+        $this->bracketBreakTime = $bracketBreakTime;
     }
 
     function ShuffleMembers()
@@ -125,10 +127,13 @@ class TournamentBracketHandler
         }
         $bracketHeader = $this->bracketHeader;
         $bracketHeader[0] = $bracketName;
+        
+        $this -> bracketCount += 1;
+       
 
         $bracketAmount = $fightCount * $this->fightTime + ($fightCount - 1) * ($this->fightBreakTime ?? 0);
         echo $bracketName . " - " . $bracketAmount . " минут. \n";
-        $this->tornamentTime += $bracketAmount + ($this->bracketBreakTime ?? 0);
+        $this->tornamentTime += $bracketAmount;
         array_unshift($bracket, $this->bracketHeader,  $bracketHeader);
 
         return $bracket;
@@ -173,11 +178,14 @@ class TournamentBracketHandler
             }
             $mainBracket = array_values($mainBracket);
         }
+       
 
         $mainBracket = $this->ImitateBracket($mainBracket, "основная сетка");
         $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная сетка", null, true);
+        
+        $this->tornamentTime += ($this -> bracketCount - 1) * ($this-> bracketBreakTime ?? 0);
         echo "время прохождения турнира - " . $this->tornamentTime . " минут.";
-
+        
         $result = array_merge(
 
             $preliminaryBracket,
