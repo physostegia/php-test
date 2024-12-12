@@ -138,6 +138,25 @@ class TournamentBracketHandler
 
         return $bracket;
     }
+    private function ValidateMembers($members)
+    {
+        $membersCount = count($this->memberList);
+        if ($membersCount < 2) {
+
+            throw new Exception("Недостаточно участников для формирования сетки");
+        }
+        for ($i = 2; $i <= $membersCount; $i *= 2) {
+            $membersValidCount = $i;
+        }
+        if($membersCount == $membersValidCount)
+        {
+            return true;
+        }
+        else{
+            return $membersCount - $membersValidCount;
+        }
+
+    }
 
     private function FormPreliminaryBracket($preliminaryFightsCount)
     {
@@ -152,51 +171,46 @@ class TournamentBracketHandler
     }
 
     function FormDefaultTournamentBracket()
-    {
-        $membersCount = count($this->memberList);
-        if ($membersCount < 2) {
+{
+    $mainBracket = $this->memberList;
+    $preliminaryBracket = [];
+    $preliminaryFightsCount = $this->ValidateMembers($this->memberList);
 
-            throw new Exception("Недостаточно участников для формирования сетки");
-        }
-        $mainMembersCount = null;
-        $preliminaryFightsCount = null;
-        $mainBracket = $this->memberList;
-        $preliminaryBracket = [];
-
-        for ($i = 2; $i <= $membersCount; $i *= 2) {
-            $mainMembersCount = $i;
-        }
-
-        $preliminaryFightsCount = $membersCount % $mainMembersCount;
-
-        if ($preliminaryFightsCount > 0) {
-            $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
-            foreach ($preliminaryBracket as $member) {
-                if (empty($member[1])) {
-                    unset($mainBracket[array_search($member, $mainBracket)]);
+    if ($preliminaryFightsCount !== true) {
+        $preliminaryBracket = $this->FormPreliminaryBracket($preliminaryFightsCount);
+        
+        foreach ($preliminaryBracket as $key => $member) {
+            if (empty($member[1])) { 
+                foreach ($mainBracket as $mainKey => $mainMember) {
+                    if ($mainMember === $member) {
+                        unset($mainBracket[$mainKey]);
+                        break;
+                    }
                 }
             }
-            $mainBracket = array_values($mainBracket);
         }
-       
-
-        $mainBracket = $this->ImitateBracket($mainBracket, "основная сетка");
-        $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная сетка", null, true);
-        
-        $this->tornamentTime += ($this -> bracketCount - 1) * ($this-> bracketBreakTime ?? 0);
-        echo "время прохождения турнира - " . $this->tornamentTime . " минут.";
-        
-        $result = array_merge(
-
-            $preliminaryBracket,
-
-            $mainBracket,
-
-            $consolationBracket,
-
-        );
-        array_shift($result);
-
-        return $result;
+        $mainBracket = array_values($mainBracket);
     }
+
+    
+    $mainBracket = $this->ImitateBracket($mainBracket, "основная сетка");
+    $consolationBracket = $this->ImitateBracket($this->consolationBracket, "утешительная сетка", null, true);
+
+    
+    $this->tornamentTime += ($this->bracketCount - 1) * ($this->bracketBreakTime ?? 0);
+    echo "время прохождения турнира - " . $this->tornamentTime . " минут.";
+
+   
+    $result = array_merge(
+        $preliminaryBracket,
+        $mainBracket,
+        $consolationBracket
+    );
+
+    
+    array_shift($result);
+
+    return $result;
+}
+
 }
