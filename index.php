@@ -90,6 +90,8 @@ class TournamentBracketHandler
     function ShuffleMembers()
     {
         shuffle($this->memberList);
+        shuffle($this->memberList);
+        shuffle($this->memberList);
     }
 
     private function ImitateBracket($bracket, $bracketName, $stages = null, $isConsolation = false)
